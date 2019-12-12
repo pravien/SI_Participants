@@ -75,8 +75,8 @@ function participants2Xml(list){
     console.log(list)
     let str = '<participants>'
     for (const participant of list){
-        str+=`<email>${participant.email}</email>
-        <name>${participant.name}</name>`
+        str+=`<participant><email>${participant.email}</email>
+        <name>${participant.name}</name></participant>`
     }
     str+='</participants>'
     return str
