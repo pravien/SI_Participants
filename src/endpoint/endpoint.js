@@ -1,7 +1,9 @@
 var express = require('express');
+const cors = require('cors');
 var app = express();
 const { toXML } = require('jstoxml');
 app.use(express.json())
+app.use(cors())
 
 let Participant = require('../businesslogic/Participant')
 
@@ -26,7 +28,10 @@ function generateParticipants(){
     ]
     for(var i = 0; i<tempList.length; i++){
         part = tempList[i]
-        participants.push(new Participant(part.email,part.name,[1,2,3,4,5]))
+        let participant = new Participant(part.email,part.name);
+        participant.events = [10,100,200,4,5];
+        participants.push(participant)
+
     }
     //console.log(participants)
 }
