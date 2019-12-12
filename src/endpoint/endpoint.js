@@ -75,8 +75,8 @@ function participants2Xml(list){
     console.log(list)
     let str = '<participants>'
     for (const participant of list){
-        console.log(participant)
-        str+=toXML({participant})
+        str+=`<email>${participant.email}</email>
+        <name>${participant.name}</name>`
     }
     str+='</participants>'
     return str
@@ -199,4 +199,5 @@ var server = app.listen(8082, function () {
     var host = server.address().address
     var port = server.address().port
     console.log("Example app listening at http://%s:%s", host, port)
+    console.log(participants2Xml(participants))
  })
