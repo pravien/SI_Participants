@@ -100,6 +100,7 @@ app.delete('/', function(req, res){
         let eventId = req.body.eventId
         let contentType = req.headers["content-type"]
         let message_con = {message : delEvent(eventId,email)}
+        res.statusCode(200)
         if(contentType == 'application/json'){
             res.set({'Content-Type': 'application/json'})
             res.send(JSON.stringify(message_con))
@@ -133,13 +134,13 @@ app.get('/:eventId', function (req, res) {
         let eventId = req.params.eventId
         let contentType = req.headers["content-type"]
         console.log(eventId,contentType)
-        if (eventId != 'all'){
+        if (eventId.toLowerCase() != 'all'){
             body = getParticipantsByEventId(eventId)
         }else{
             body = participants
         } 
         console.log('body',body)
-        res.status(201)
+        res.status(200)
         if(contentType == 'application/json'){
             res.send(JSON.stringify(body))  
         }else{
@@ -147,6 +148,7 @@ app.get('/:eventId', function (req, res) {
         }
     }catch(error){
         console.log(error)
+        res.status(409)
         if(contentType == 'application/json'){
             res.send(JSON.stringify({
                 message:"failed"
