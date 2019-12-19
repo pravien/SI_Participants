@@ -8,7 +8,8 @@ app.use(cors())
 let Participant = require('../businesslogic/Participant')
 
 let participants = []
-let events = []  
+let events = []
+let _id = 0
 function generateParticipants(){
     tempList = [
         {
@@ -28,7 +29,8 @@ function generateParticipants(){
     ]
     for(var i = 0; i<tempList.length; i++){
         part = tempList[i]
-        let participant = new Participant(part.email,part.name);
+        let participant = new Participant(_id,part.email,part.name);
+        _id+=1
         participant.events = [10,100,200,4,5];
         participants.push(participant)
 
@@ -51,10 +53,11 @@ function addEventToParticipant(eventId,participantEmail,participantName){
     }
     if (added != true){
         console.log(`Participant with email ${participantEmail} not found`)
-        participant = new Participant(participantEmail,participantName)
+        participant = new Participant(_id,participantEmail,participantName)
+        _id+=1
         participant.addEvent(eventId)
         participants.push(participant)
-        console.log(`Created participant with email ${participantEmail} and added event ${eventId}`)
+        console.log(`Created participant with id ${_id} and added event ${eventId}`)
     }
 }
 
@@ -75,16 +78,16 @@ function participants2Xml(list){
     console.log(list)
     let str = '<participants>'
     for (const participant of list){
-        str+=`<participant><email>${participant.email}</email>
+        str+=`<participant><id>${participant.id}</id><email>${participant.email}</email>
         <name>${participant.name}</name></participant>`
     }
     str+='</participants>'
     return str
 }
 
-function delEvent(eventId,email){
+function delEvent(eventId,participantId){
     for (const participant of participants){
-        if(participant.email == email){
+        if(participant.id == participantId){
             participant.deleteEvent(eventId)
             return 'success'
         }
@@ -94,13 +97,13 @@ function delEvent(eventId,email){
 
 // Delete by event ID for user params body must contain email and eventid
 
-app.delete('/', function(req, res){
+app.delete('/:participantId/event/:eventId', function(req, res){
     try{
-        let email = req.body.email
-        let eventId = req.body.eventId
+        let participantId = req.params.participantId
+        let eventId = req.params.eventId
         let contentType = req.headers["content-type"]
-        let message_con = {message : delEvent(eventId,email)}
-        res.statusCode(200)
+        let message_con = {message : delEvent(eventId,participantId)}
+        res.status(200)
         if(contentType == 'application/json'){
             res.set({'Content-Type': 'application/json'})
             res.send(JSON.stringify(message_con))
@@ -111,7 +114,9 @@ app.delete('/', function(req, res){
 
     }
     catch(error){
-        res.status(401)
+        res.status(400)
+        console.log(error)
+        let contentType = req.headers["content-type"]
         if(contentType == 'application/json'){
             res.send(JSON.stringify({
                 message:"failed"
@@ -131,8 +136,8 @@ app.delete('/', function(req, res){
 app.get('/:eventId', function (req, res) {
     try{
         let body = []
-        let eventId = req.params.eventId
         let contentType = req.headers["content-type"]
+        let eventId = req.params.eventId
         console.log(eventId,contentType)
         if (eventId.toLowerCase() != 'all'){
             body = getParticipantsByEventId(eventId)
@@ -148,7 +153,8 @@ app.get('/:eventId', function (req, res) {
         }
     }catch(error){
         console.log(error)
-        res.status(409)
+        let contentType = req.headers["content-type"]
+        res.status(400)
         if(contentType == 'application/json'){
             res.send(JSON.stringify({
                 message:"failed"
@@ -182,7 +188,9 @@ app.get('/:eventId', function (req, res) {
         }
     }
     catch(error) {
-        res.status(401)
+        res.status(400)
+        let contentType = req.headers["content-type"]
+        console.log(error)
         if(contentType == 'application/json'){
             res.send(JSON.stringify({
                 message:"failed"
