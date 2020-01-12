@@ -5,7 +5,7 @@ const { toXML } = require('jstoxml');
 app.use(express.json())
 app.use(cors())
 
-let Participant = require('../businesslogic/Participant')
+let Participant = require('../businesslogic/participant')
 
 let participants = []
 let events = []
